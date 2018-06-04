@@ -36,12 +36,8 @@ module.exports = function(RED) {
 				});
 
 				// Build query obj
-				// TODO: add query params based on input: source(deviceId), timeRange, measurementId
 				var reqQuery = {};
-				if (n.deviceId) {
-					reqQuery.source = n.deviceId;
-					basePath += 'series';
-				}
+
 				if (n.startDate) {
 					reqQuery.dateFrom = new Date(n.startDate).toISOString();
 				}
@@ -56,9 +52,17 @@ module.exports = function(RED) {
 					reqQuery.pageSize = 25; // TODO: externalize default value
 				}
 
+				if (n.deviceId) reqQuery.source = n.deviceId;
+
 				// Stringify query obj
 				var thisQueryString = queryString.stringify(reqQuery);
-				console.log('Query String: ' + thisQueryString);
+
+				var pathAndQuery;
+				if (n.deviceId) {
+					pathAndQuery = basePath + 'series?' + thisQueryString;
+				} else {
+					pathAndQuery = basePath + '?' + thisQueryString;
+				}
 
 				// Adding auth header // TODO: develop a more secure way to do this
 				var encodedCreds;
@@ -117,6 +121,7 @@ module.exports = function(RED) {
 						var measurements = JSON.parse(body).measurements;
 						msg.payload = measurements;
 						msg.statusCode = resp.statusCode || resp.status;
+						if (measurements.length < 1) msg.statusCode = 244;
 						msg.headers = resp.headers;
 
 						// Error-handling
