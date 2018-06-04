@@ -38,17 +38,23 @@ module.exports = function(RED) {
 				// Build query obj
 				// TODO: add query params based on input: source(deviceId), timeRange, measurementId
 				var reqQuery = {};
-				if (node.deviceId) {
-					reqQuery.source = node.deviceId;
+				if (n.deviceId) {
+					reqQuery.source = n.deviceId;
 					basePath += 'series';
 				}
-				if (node.startDate && node.endDate) { // TODO find out dateFormat; also look into dateinput widget (html) for the node, instead of string input
-					reqQuery.dateFrom = node.startDate;
-					reqQuery.dateTo = node.endDate;
+				if (n.startDate && n.endDate) { // TODO find out dateFormat; also look into dateinput widget (html) for the node, instead of string input
+					reqQuery.dateFrom = n.startDate;
+					reqQuery.dateTo = n.endDate;
+				}
+				if (n.pageSize) {
+					reqQuery.pageSize = n.pageSize;
+				} else {
+					reqQuery.pageSize = 25; // TODO: externalize default value
 				}
 
 				// Stringify query obj
 				var thisQueryString = queryString.stringify(reqQuery);
+				console.log('Query String: ' + thisQueryString);
 
 				// Adding auth header // TODO: develop a more secure way to do this
 				var encodedCreds;
@@ -77,11 +83,11 @@ module.exports = function(RED) {
 
 				var respBody, respStatus;
 				var options = {
-					url: "https://" + domain + basePath,
+					url: "https://" + domain + basePath + '?' + thisQueryString,
 					headers: {
 						'Authorization': 'Basic ' + encodedCreds
-					},
-					qs: thisQueryString
+					}
+					// qs: thisQueryString
 				};
 
 				var thisReq = request.get(options, function(err, resp, body) {
@@ -104,6 +110,7 @@ module.exports = function(RED) {
 						});
 						return node.send(msg);
 					} else {
+						
 						msg.payload = body;
 						msg.statusCode = resp.statusCode || resp.status;
 						msg.headers = resp.headers;

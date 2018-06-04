@@ -1,6 +1,6 @@
 {
   "name": "node-red-contrib-c8y-measuremts",
-  "version": "0.0.2",
+  "version": "0.1.1",
   "description": "NodeRed node that integrates with cumulocity to return measurement data",
   "main": "c8y-measurements.js",
   "scripts": {

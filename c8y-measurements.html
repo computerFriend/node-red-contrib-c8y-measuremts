@@ -5,12 +5,12 @@
 	</div>
 
 	<div class="form-row">
-		<label for="node-input-domain"><i class="fa fa-server"></i> Cumulocity Instance</label>
+		<label for="node-input-domain"></i> Instance Name</label>
 		<input type="text" id="node-input-domain" placeholder="instanceName.io">
 	</div>
 
 	<div class="form-row">
-		<label for="node-input-tenant"><i class="fa fa-server"></i> Tenant Name</label>
+		<label for="node-input-tenant"></i> Tenant Name</label>
 		<input type="text" id="node-input-tenant" placeholder="tenantName">
 	</div>
 
@@ -26,6 +26,11 @@
 	<div class="form-row">
 		<label for="node-input-endDate"><i class="fa fa-calendar"></i> End Date </label>
 		<input type="text" id="node-input-endDate" placeholder="(optional)">
+	</div>
+
+	<div class="form-row">
+		<label for="node-input-pageSize"><i class="fa fa-file-alt"></i> Page Size </label>
+		<input type="text" id="node-input-pageSize" placeholder="(optional)">
 	</div>
 
 	<div class="form-row">
@@ -58,13 +63,15 @@
 	<p>The tenant name must be configured in the node.</p>
 	<ul>
 		<li>Required inputs:
-			<ul>Tenant name</ul>
+			<ul>Cumulocity Instance Name (string)</ul>
+			<ul>Tenant Name (string)</ul>
 		</li>
 		<li>Optional inputs (to filter results):
 			<ul>DeviceId (number) - filter by device</ul>
 			<ul>StartDate (ISO Date Format: YYYY-MM-DDTHH:MM:SSZ) - filter by date posted</ul>
 			<ul>EndDate (ISO Date Format: YYYY-MM-DDTHH:MM:SSZ) - filter by date posted</ul>
 			<ul>MeasurementId (number) - return a specific measurement</ul>
+			<ul>PageSize (number) - number of measurements to include per page. (Default: 25)</ul>
 		</li>
 
 	</ul>
@@ -97,6 +104,15 @@
 			tenant: {
 				value: "",
 				required: true
+			},
+			startDate: {
+				value: ""
+			},
+			endDate: {
+				value: ""
+			},
+			pageSize: {
+				value: "25"
 			}
 		},
 		credentials: {
