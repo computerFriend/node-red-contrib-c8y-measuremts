@@ -42,10 +42,14 @@ module.exports = function(RED) {
 					reqQuery.source = n.deviceId;
 					basePath += 'series';
 				}
-				if (n.startDate && n.endDate) { // TODO find out dateFormat; also look into dateinput widget (html) for the node, instead of string input
-					reqQuery.dateFrom = n.startDate;
-					reqQuery.dateTo = n.endDate;
+				if (n.startDate) {
+					reqQuery.dateFrom = new Date(n.startDate).toISOString();
 				}
+
+				if(n.endDate) {
+					reqQuery.dateTo = new Date(n.endDate).toISOString();
+				}
+
 				if (n.pageSize) {
 					reqQuery.pageSize = n.pageSize;
 				} else {
@@ -87,7 +91,6 @@ module.exports = function(RED) {
 					headers: {
 						'Authorization': 'Basic ' + encodedCreds
 					}
-					// qs: thisQueryString
 				};
 
 				var thisReq = request.get(options, function(err, resp, body) {
@@ -110,8 +113,9 @@ module.exports = function(RED) {
 						});
 						return node.send(msg);
 					} else {
-						
-						msg.payload = body;
+
+						var measurements = JSON.parse(body).measurements;
+						msg.payload = measurements;
 						msg.statusCode = resp.statusCode || resp.status;
 						msg.headers = resp.headers;
 
@@ -127,11 +131,11 @@ module.exports = function(RED) {
 
 						// Transform output
 						if (node.ret !== "bin") {
-							msg.payload = body.toString('utf8'); // txt
+							msg.payload = JSON.stringify(measurements).toString('utf8'); // txt
 
 							if (node.ret === "obj") {
 								try {
-									msg.payload = JSON.parse(body);
+									msg.payload = measurements;
 								} catch (e) {
 									node.warn(RED._("c8yMeasurements.errors.json-error"));
 								}
