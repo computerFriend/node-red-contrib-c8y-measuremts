@@ -5,8 +5,13 @@
 	</div>
 
 	<div class="form-row">
-		<label for="node-input-tenant"><i class="fa fa-server"></i> Full Tenant Name</label>
-		<input type="text" id="node-input-tenant" placeholder="your.tenant.io">
+		<label for="node-input-domain"><i class="fa fa-server"></i> Cumulocity Instance</label>
+		<input type="text" id="node-input-domain" placeholder="instanceName.io">
+	</div>
+
+	<div class="form-row">
+		<label for="node-input-tenant"><i class="fa fa-server"></i> Tenant Name</label>
+		<input type="text" id="node-input-tenant" placeholder="tenantName">
 	</div>
 
 	<div class="form-row">
@@ -28,11 +33,11 @@
 		<label for="node-input-useAuth" style="width: 70%;"><span data-i18n="c8yMeasurements.basicauth"></span> Use basic authentication </label>
 		<div style="margin-left: 20px" class="node-input-useAuth-row hide">
 			<div class="form-row">
-				<label for="node-input-user"><i class="fa fa-user"></i> <span data-i18n="common.label.username"></span></label>
+				<label for="node-input-user"><i class="fa fa-user"></i><span data-i18n="common.label.username"> Username</span></label>
 				<input type="text" id="node-input-user">
 			</div>
 			<div class="form-row">
-				<label for="node-input-password"><i class="fa fa-lock"></i> <span>Password</span></label>
+				<label for="node-input-password"><i class="fa fa-lock"></i><span> Password</span></label>
 				<input type="password" id="node-input-password">
 			</div>
 		</div>
@@ -77,13 +82,17 @@
 <script type="text/javascript">
 	RED.nodes.registerType('c8y-measurements', {
 		category: 'cumulocity',
-		color: "rgb(22, 151, 201)",
+		color: "rgb(106, 210, 252)",
 		defaults: {
 			name: {
 				value: ""
 			},
 			ret: {
 				value: "txt"
+			},
+			domain: {
+				value: "",
+				required: true
 			},
 			tenant: {
 				value: "",

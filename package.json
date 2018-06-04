@@ -24,5 +24,10 @@
     "query-string": "^6.1.0",
     "request": "^2.87.0",
     "utf8": "^3.0.0"
+  },
+  "node-red": {
+    "nodes": {
+      "c8y-measurements": "c8y-measurements.js"
+    }
   }
 }

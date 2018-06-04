@@ -23,12 +23,11 @@ module.exports = function(RED) {
 			this.reqTimeout = 60000;
 		}
 
-		var tenant = node.tenant;
-		// var domain = tenant + '.' + c8yInstanceName;
-		var domain = tenant; // NOTE temp soln
-
 		// 1) Process inputs to Node
 		this.on("input", function(msg) {
+
+			var tenant = n.tenant;
+			var domain = n.domain; // TODO: get this from settings value in the future
 
 				node.status({
 					fill: "blue",
@@ -57,10 +56,23 @@ module.exports = function(RED) {
 					var rawCreds = tenant + '/' + this.credentials.user + ':' + this.credentials.password;
 					var byteCreds = utf8.encode(rawCreds);
 					encodedCreds = base64.encode(byteCreds);
+					// Trim off trailing =
+					if (encodedCreds[encodedCreds.length-1]== '=') {
+						encodedCreds = encodedCreds.substring(0,encodedCreds.length-2);
+					}
+
 				} // else if: TODO: check for creds in settings.js file
 				// encodedCreds = value.from.settings
 				else {
-					// TODO: log error: missing credentials!
+					msg.error = "Missing credentials";
+					msg.statusCode = 403;
+					msg.payload = "error: Missing Credentials";
+					node.status({
+						fill: "red",
+						shape: "ring",
+						text: "Missing credentials!"
+					});
+					return node.send(msg);
 				}
 
 				var respBody, respStatus;
@@ -75,35 +87,54 @@ module.exports = function(RED) {
 				var thisReq = request.get(options, function(err, resp, body) {
 
 					if (err || !resp) {
-						var statusText = "Unexpected error";
+						var nodeStatusText = "Unexpected error";
 						if (err) {
-							statusText = err;
+							msg.payload = err.toString();
+							msg.statusCode = 499;
+							nodeStatusText = 'Error';
 						} else if (!resp) {
-							statusText = "No response object";
+							msg.statusCode = 500;
+							msg.payload = "Server error: No response object";
+							nodeStatusText = "Server error";
 						}
 						node.status({
 							fill: "red",
 							shape: "ring",
-							text: statusText
+							text: nodeStatusText
 						});
-					}
-					msg.payload = body;
-					msg.statusCode = resp.statusCode || resp.status;
-					msg.headers = resp.headers;
+						return node.send(msg);
+					} else {
+						msg.payload = body;
+						msg.statusCode = resp.statusCode || resp.status;
+						msg.headers = resp.headers;
 
-					if (node.ret !== "bin") {
-						msg.payload = body.toString('utf8'); // txt
+						// Error-handling
+						if (body.error || resp.statusCode > 299) {
+							node.status({
+								fill: "red",
+								shape: "ring",
+								text: body.message
+							});
+						}
 
-						if (node.ret === "obj") {
-							try {
-								msg.payload = JSON.parse(body);
-							} catch (e) {
-								node.warn(RED._("c8yMeasurements.errors.json-error"));
+
+						// Transform output
+						if (node.ret !== "bin") {
+							msg.payload = body.toString('utf8'); // txt
+
+							if (node.ret === "obj") {
+								try {
+									msg.payload = JSON.parse(body);
+								} catch (e) {
+									node.warn(RED._("c8yMeasurements.errors.json-error"));
+								}
 							}
 						}
 					}
 
 					node.send(msg);
+					node.status({});
+
 				});
 
 		}); // end of on.input
