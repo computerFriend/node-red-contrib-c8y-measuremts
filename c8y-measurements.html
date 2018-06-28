@@ -59,7 +59,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="c8y-measurements">
-	<p>Provides a node fetching measurement data from cumulocity.  This work is neither finalized nor intended for public use at this time.</p>
+	<p>Provides a node fetching measurement data from cumulocity.</p>
 	<p>The tenant name must be configured in the node.</p>
 	<ul>
 		<li>Required inputs:
@@ -78,7 +78,7 @@
 	<p>
 		The output message contains the following properties:
 		<ul>
-			<li><code>payload</code> is the body of the response</li>
+			<li><code>payload</code> is an array of all measurements</li>
 			<li><code>statusCode</code> is the status code of the response, or the error code if the request could not be completed</li>
 			<li><code>headers</code> is an object containing the response headers</li>
 		</ul>

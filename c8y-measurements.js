@@ -7,7 +7,6 @@ var request = require('request'),
 // define constants
 // NOTE: not using 'const' bc we want this node to be compatible with early ES versions (<ES6)
 var	basePath = '/measurement/measurements'; // this is a constant, dependent on c8y
-	// c8yInstanceName = 'sbdconnect.io'; // TODO: store in settings.js file
 
 module.exports = function(RED) {
 
